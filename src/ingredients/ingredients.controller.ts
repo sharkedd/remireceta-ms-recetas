@@ -3,33 +3,32 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { IngredientsService } from './ingredients.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
-
 @Controller()
 export class IngredientsController {
   constructor(private readonly ingredientsService: IngredientsService) {}
-
-  @MessagePattern('createIngredient')
+  // 🟢 CREATE
+  @MessagePattern({ cmd: 'create_ingredient' })
   create(@Payload() createIngredientDto: CreateIngredientDto) {
     return this.ingredientsService.create(createIngredientDto);
   }
-
-  @MessagePattern('findAllIngredients')
+  // 🔵 READ ALL
+  @MessagePattern({ cmd: 'get_all_ingredients' })
   findAll() {
     return this.ingredientsService.findAll();
   }
-
-  @MessagePattern('findOneIngredient')
-  findOne(@Payload() id: number) {
+  // 🟢 READ ONE
+  @MessagePattern({ cmd: 'get_ingredient_by_id' })
+  findOne(@Payload() id: string) {
     return this.ingredientsService.findOne(id);
   }
-
-  @MessagePattern('updateIngredient')
-  update(@Payload() updateIngredientDto: UpdateIngredientDto) {
-    return this.ingredientsService.update(updateIngredientDto.id, updateIngredientDto);
+  // 🟣 UPDATE
+  @MessagePattern({ cmd: 'update_ingredient' })
+  update(@Payload() payload: { id: string; data: UpdateIngredientDto }) {
+    return this.ingredientsService.update(payload.id, payload.data);
   }
-
-  @MessagePattern('removeIngredient')
-  remove(@Payload() id: number) {
+  // 🔴 DELETE
+  @MessagePattern({ cmd: 'delete_ingredient' })
+  remove(@Payload() id: string) {
     return this.ingredientsService.remove(id);
   }
 }
