@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { IngredientsService } from './ingredients.service';
 import { IngredientsController } from './ingredients.controller';
 import { Ingredient, IngredientSchema } from './schemas/ingredient.schema';
-import { MongooseModule } from '@nestjs/mongoose';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -11,5 +12,6 @@ import { MongooseModule } from '@nestjs/mongoose';
   ],
   controllers: [IngredientsController],
   providers: [IngredientsService],
+  exports: [IngredientsService],
 })
 export class IngredientsModule {}

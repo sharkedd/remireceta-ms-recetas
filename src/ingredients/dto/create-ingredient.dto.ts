@@ -1,21 +1,22 @@
 import { IsString, IsOptional, IsNumber, IsArray } from 'class-validator';
+
 export class CreateIngredientDto {
   @IsString()
   name: string;
 
-  @IsOptional()
   @IsArray()
-  tags?: string[];
-
   @IsOptional()
+  tags?: string[] = [];
+
   @IsString()
+  @IsOptional()
   category?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   unit?: string;
 
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   caloriesPerUnit?: number;
 }

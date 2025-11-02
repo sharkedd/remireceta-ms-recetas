@@ -22,4 +22,5 @@ export class Ingredient extends Document {
 export const IngredientSchema = SchemaFactory.createForClass(Ingredient);
 
 // Búsquedas rápidas por nombre y tags
-IngredientSchema.index({ name: 'text', tags: 1, category: 1 });
+IngredientSchema.index({ name: 'text', category: 'text' });
+IngredientSchema.index({ tags: 1 });
