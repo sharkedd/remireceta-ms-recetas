@@ -8,28 +8,31 @@ import { UpdateRecipeDto } from './dto/update-recipe.dto';
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
 
-  @MessagePattern('createRecipe')
+  @MessagePattern({ cmd: 'create_recipe' })
   create(@Payload() createRecipeDto: CreateRecipeDto) {
     return this.recipesService.create(createRecipeDto);
   }
 
-  @MessagePattern('findAllRecipes')
+  @MessagePattern({ cmd: 'get_all_recipes' })
   findAll() {
     return this.recipesService.findAll();
   }
 
-  @MessagePattern('findOneRecipe')
-  findOne(@Payload() id: number) {
+  @MessagePattern({ cmd: 'find_recipe_by_id' })
+  findOne(@Payload() id: string) { // <--- CAMBIO: number a string
     return this.recipesService.findOne(id);
   }
 
-  @MessagePattern('updateRecipe')
+  @MessagePattern({ cmd: 'update_recipe' })
   update(@Payload() updateRecipeDto: UpdateRecipeDto) {
-    return this.recipesService.update(updateRecipeDto.id, updateRecipeDto);
+    // Convertimos el ID a string para asegurar compatibilidad con Mongo
+    // Aunque el DTO diga number, en tiempo de ejecución llegará lo que mande el Gateway
+    const id = String(updateRecipeDto.id); 
+    return this.recipesService.update(id, updateRecipeDto);
   }
 
-  @MessagePattern('removeRecipe')
-  remove(@Payload() id: number) {
+  @MessagePattern({ cmd: 'remove_recipe' })
+  remove(@Payload() id: string) { // <--- CAMBIO: number a string
     return this.recipesService.remove(id);
   }
 }

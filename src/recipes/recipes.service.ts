@@ -1,26 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { Recipe } from './entities/recipe.entity'; // Ojo: Verifica si es entities o schemas
 
 @Injectable()
 export class RecipesService {
-  create(createRecipeDto: CreateRecipeDto) {
-    return 'This action adds a new recipe';
+  private readonly logger = new Logger(RecipesService.name);
+
+  constructor(
+    @InjectModel(Recipe.name) private readonly recipeModel: Model<Recipe>,
+  ) {}
+
+  async create(createRecipeDto: CreateRecipeDto) {
+    this.logger.log('Creating new recipe...');
+    const createdRecipe = new this.recipeModel(createRecipeDto);
+    return await createdRecipe.save();
   }
 
-  findAll() {
-    return `This action returns all recipes`;
+  async findAll() {
+    return await this.recipeModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recipe`;
+  async findOne(id: string) { // Cambié number por string porque Mongo usa strings
+    return await this.recipeModel.findById(id).exec();
   }
 
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    return `This action updates a #${id} recipe`;
+  async update(id: string, updateRecipeDto: UpdateRecipeDto) {
+    return await this.recipeModel.findByIdAndUpdate(id, updateRecipeDto, { new: true }).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recipe`;
+  async remove(id: string) {
+    return await this.recipeModel.findByIdAndDelete(id).exec();
   }
 }
