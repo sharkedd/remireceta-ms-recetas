@@ -1,15 +1,21 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RecipesService } from './recipes.service';
-import { RecipesController } from './recipes.controller';
-import { Recipe, RecipeSchema } from './entities/recipe.entity'; // O './schemas/recipe.schema'
+import { Recipe, RecipeSchema } from './schemas/recipe.schema';
+import {
+  Ingredient,
+  IngredientSchema,
+} from 'src/ingredients/schemas/ingredient.schema';
+import { RecipeService } from './recipes.service';
+import { RecipeController } from './recipe.controller';
 
 @Module({
   imports: [
-    // ESTA ES LA LÍNEA MÁGICA QUE FALTA:
-    MongooseModule.forFeature([{ name: Recipe.name, schema: RecipeSchema }]),
+    MongooseModule.forFeature([
+      { name: Recipe.name, schema: RecipeSchema },
+      { name: Ingredient.name, schema: IngredientSchema },
+    ]),
   ],
-  controllers: [RecipesController],
-  providers: [RecipesService],
+  controllers: [RecipeController],
+  providers: [RecipeService],
 })
-export class RecipesModule {}
+export class RecipeModule {}

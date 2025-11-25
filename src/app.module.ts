@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RecipesModule } from './recipes/recipes.module';
+import { RecipeModule } from './recipes/recipes.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { RecipesModule } from './recipes/recipes.module';
     // Conexión a MongoDB usando la variable de entorno
     MongooseModule.forRoot(process.env.MONGODB_URI!),
     IngredientsModule,
-    RecipesModule,
+    RecipeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
