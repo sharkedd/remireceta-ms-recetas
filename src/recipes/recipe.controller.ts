@@ -59,4 +59,14 @@ export class RecipeController {
   searchByCaloriesRange(@Payload() data: { min: number; max: number }) {
     return this.recipeService.searchByCaloriesRange(data.min, data.max);
   }
+
+  @MessagePattern({ cmd: 'find_recipes_by_user' })
+  findByUser(@Payload() data: { userId: string }) {
+    return this.recipeService.findByUser(data.userId);
+  }
+
+  @MessagePattern({ cmd: 'search_recipes_by_categories' })
+  searchByCategories(@Payload() data: { categories: string }) {
+    return this.recipeService.searchByCategories(data.categories);
+  }
 }

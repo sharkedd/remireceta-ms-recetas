@@ -226,24 +226,34 @@ export class RecipeService {
       });
     }
 
-    const ingredientIds = ingredients.split(',');
+    // 1. Separar y limpiar nombres
+    const ingredientNames = ingredients.split(',').map((n) => n.trim());
 
+    // 2. Buscar ingredientes por name
     const found = await this.ingredientModel.find({
-      _id: { $in: ingredientIds },
+      name: { $in: ingredientNames },
     });
 
-    if (found.length !== ingredientIds.length) {
+    if (found.length !== ingredientNames.length) {
+      const missing = ingredientNames.filter(
+        (name) => !found.some((f) => f.name === name),
+      );
       throw new RpcException({
         status: 404,
-        message: '❌ Uno o más ingredientes no existen',
+        message: `❌ Los siguientes ingredientes no existen: ${missing.join(', ')}`,
       });
     }
 
+    // 3. Convertir a IDs para hacer la búsqueda en recetas
+    const ingredientIds = found.map((i) => i._id);
+
+    // 4. Construir query según mode
     const query =
       mode === 'all'
         ? { 'ingredients.ingredientId': { $all: ingredientIds } }
         : { 'ingredients.ingredientId': { $in: ingredientIds } };
 
+    // 5. Buscar recetas
     const recipes = await this.recipeModel
       .find(query)
       .populate('ingredients.ingredientId');
@@ -307,6 +317,50 @@ export class RecipeService {
       throw new RpcException({
         status: 404,
         message: `❌ No se encontraron recetas entre ${min} y ${max} calorías`,
+      });
+    }
+
+    return recipes;
+  }
+
+  async findByUser(userId: string) {
+    const recipes = await this.recipeModel
+      .find({ userId })
+      .populate('ingredients.ingredientId')
+      .exec();
+
+    if (!recipes.length) {
+      throw new RpcException({
+        status: 404,
+        message: '❌ Este usuario no tiene recetas registradas',
+      });
+    }
+
+    return recipes;
+  }
+
+  async searchByCategories(categories: string) {
+    if (!categories || categories.trim().length === 0) {
+      throw new RpcException({
+        status: 400,
+        message: '❌ Debes proporcionar al menos una categoría',
+      });
+    }
+
+    // Separar y limpiar
+    const categoryList = categories.split(',').map((c) => c.trim());
+
+    const recipes = await this.recipeModel
+      .find({
+        categories: { $in: categoryList },
+      })
+      .populate('ingredients.ingredientId')
+      .exec();
+
+    if (!recipes.length) {
+      throw new RpcException({
+        status: 404,
+        message: '❌ No se encontraron recetas para esas categorías',
       });
     }
 

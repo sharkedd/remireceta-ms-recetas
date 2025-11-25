@@ -1,8 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Recipe extends Document {
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  })
+  userId: string;
+
   @Prop({ required: true, trim: true })
   title: string;
 
