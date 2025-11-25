@@ -9,19 +9,20 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class IngredientEntryDto {
-  @IsMongoId()
-  ingredientId: string;
+export class IngredientEntryMicroDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string; // el cliente envía el nombre del ingrediente
 
   @IsNumber()
   quantity: number;
 
   @IsOptional()
   @IsString()
-  unit?: string;
+  unit?: string; // permite sobrescribir la unidad base
 }
 
-export class CreateRecipeDto {
+export class CreateRecipeMicroDto {
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -46,6 +47,9 @@ export class CreateRecipeDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => IngredientEntryDto)
-  ingredients: IngredientEntryDto[];
+  @Type(() => IngredientEntryMicroDto)
+  ingredients: IngredientEntryMicroDto[];
+
+  @IsMongoId()
+  userId: string; // viene desde el gateway
 }
