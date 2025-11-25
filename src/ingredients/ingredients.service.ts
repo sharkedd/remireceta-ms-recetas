@@ -106,18 +106,13 @@ export class IngredientsService {
 
     // Limpieza básica y evitar duplicados dentro del array recibido
     const uniqueNames = new Set();
-    const cleanList = ingredientsList
-      .filter((i) => {
-        if (!i.name) return false;
-        const lower = i.name.trim().toLowerCase();
-        if (uniqueNames.has(lower)) return false;
-        uniqueNames.add(lower);
-        return true;
-      })
-      .map((i) => ({
-        ...i,
-        tags: i.tags ?? [], // evita undefined
-      }));
+    const cleanList = ingredientsList.filter((i) => {
+      if (!i.name) return false;
+      const lower = i.name.trim().toLowerCase();
+      if (uniqueNames.has(lower)) return false;
+      uniqueNames.add(lower);
+      return true;
+    });
 
     // Verificar duplicados ya existentes en la base de datos
     const existing = await this.ingredientModel
