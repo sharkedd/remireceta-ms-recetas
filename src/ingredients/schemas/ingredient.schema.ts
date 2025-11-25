@@ -6,12 +6,6 @@ export class Ingredient extends Document {
   @Prop({ required: true, unique: true, trim: true })
   name: string; // "Tomate", "Aceite de oliva"
 
-  @Prop({ type: [String], default: [] })
-  tags: string[]; // ["vegetariano", "sin_gluten", "vegano"]
-
-  @Prop({ required: false })
-  category?: string; // "Verdura", "Lácteo", "Proteína", etc.
-
   @Prop({ required: false })
   unit?: string; // "gramos", "ml", "unidad", etc.
 
