@@ -50,9 +50,11 @@ export class RecipeService {
   }
 
   // ============================================================
-  // 🟢 Crear receta
+  // 🟢 Crear receta - Recibe INGREDIENTES POR NOMBRE
   // ============================================================
   async create(dto: CreateRecipeMicroDto): Promise<Recipe> {
+    console.log('DTO RECIBIDO:', JSON.stringify(dto, null, 2));
+
     if (!dto.ingredients || dto.ingredients.length === 0) {
       throw new RpcException({
         status: 400,
@@ -62,9 +64,19 @@ export class RecipeService {
 
     const normalizedIngredients: NormalizedIngredient[] = [];
 
+    console.log('Ingredientes recibidos para crear receta:', dto.ingredients);
+
     for (const ing of dto.ingredients) {
+      if (!ing.name || !ing.quantity) {
+        throw new RpcException({
+          status: 400,
+          message: `❌ Cada ingrediente debe tener "name" y "quantity"`,
+        });
+      }
+
+      // 🔥 Buscar ingrediente SOLO por nombre
       const ingredientDoc = await this.ingredientModel.findOne({
-        name: ing.name,
+        name: ing.name.trim(),
       });
 
       if (!ingredientDoc) {
@@ -74,19 +86,21 @@ export class RecipeService {
         });
       }
 
+      // 🔥 Normalizar ingrediente
       normalizedIngredients.push({
-        ingredientId: ingredientDoc.id, // string seguro
+        ingredientId: ingredientDoc._id.toString(),
         quantity: ing.quantity,
-        unit: ing.unit ?? ingredientDoc.unit,
+        unit: ingredientDoc.unit, // se usa la unidad por defecto
       });
     }
 
+    // 🔥 Calcular calorías usando los IDs ya convertidos
     const calories = await this.calculateCalories(normalizedIngredients);
 
+    // 🔥 Crear receta completa
     const recipe = new this.recipeModel({
       ...dto,
-      ingredients: normalizedIngredients, // aquí va la versión normalizada
-      userId: dto.userId,
+      ingredients: normalizedIngredients,
       calories,
     });
 
@@ -352,7 +366,7 @@ export class RecipeService {
 
     const recipes = await this.recipeModel
       .find({
-        categories: { $in: categoryList },
+        categories: { $all: categoryList },
       })
       .populate('ingredients.ingredientId')
       .exec();
